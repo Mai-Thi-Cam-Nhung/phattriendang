@@ -1,0 +1,1631 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quản lý Phát triển Đảng viên - Chi bộ HTTT</title>
+<style>
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --red:       #c0392b;
+  --red-dark:  #922b21;
+  --red-light: #e74c3c;
+  --gold:      #f1c40f;
+  --gold-dark: #d4a017;
+  --gold-light:#fde68a;
+  --bg:        #f5f5f5;
+  --white:     #ffffff;
+  --gray-100:  #f8f9fa;
+  --gray-200:  #e9ecef;
+  --gray-300:  #dee2e6;
+  --gray-400:  #ced4da;
+  --gray-500:  #adb5bd;
+  --gray-600:  #6c757d;
+  --gray-700:  #495057;
+  --gray-800:  #343a40;
+  --gray-900:  #212529;
+  --success:   #27ae60;
+  --warning:   #f39c12;
+  --info:      #2980b9;
+  --danger:    #c0392b;
+  --sidebar-w: 260px;
+  --header-h:  64px;
+  --shadow:    0 2px 12px rgba(0,0,0,.12);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,.18);
+  --radius:    10px;
+  --transition:0.22s ease;
+}
+html { font-size: 15px; scroll-behavior: smooth; }
+body {
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+  background: var(--bg);
+  color: var(--gray-800);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; font-family: inherit; }
+input, select, textarea { font-family: inherit; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--gray-200); }
+::-webkit-scrollbar-thumb { background: var(--red); border-radius: 3px; }
+
+/* ===== HEADER ===== */
+#header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  height: var(--header-h);
+  background: linear-gradient(135deg, var(--red-dark) 0%, var(--red) 60%, var(--red-light) 100%);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px 0 16px;
+  box-shadow: 0 2px 16px rgba(0,0,0,.25);
+}
+.header-left { display: flex; align-items: center; gap: 12px; }
+.header-logo {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: var(--gold);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 900; color: var(--red-dark);
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+  flex-shrink: 0;
+}
+.header-title { color: var(--white); }
+.header-title h1 { font-size: 1.05rem; font-weight: 700; line-height: 1.2; }
+.header-title p  { font-size: 0.75rem; opacity: .85; }
+.header-right { display: flex; align-items: center; gap: 10px; }
+.header-badge {
+  background: var(--gold); color: var(--red-dark);
+  border-radius: 20px; padding: 4px 12px;
+  font-size: 0.78rem; font-weight: 700;
+}
+.btn-menu-toggle {
+  display: none; background: none; border: none;
+  color: var(--white); font-size: 1.5rem; padding: 4px;
+}
+
+/* ===== SIDEBAR ===== */
+#sidebar {
+  position: fixed; left: 0; top: var(--header-h); bottom: 0; z-index: 900;
+  width: var(--sidebar-w);
+  background: var(--gray-900);
+  overflow-y: auto;
+  transition: transform var(--transition);
+  display: flex; flex-direction: column;
+}
+#sidebar.hidden { transform: translateX(-100%); }
+.sidebar-section { padding: 8px 0; }
+.sidebar-section-title {
+  padding: 6px 18px 4px;
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 1.2px;
+  color: var(--gray-500); text-transform: uppercase;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 18px;
+  color: var(--gray-400);
+  cursor: pointer;
+  transition: all var(--transition);
+  border-left: 3px solid transparent;
+  font-size: 0.9rem;
+}
+.nav-item:hover { background: rgba(255,255,255,.06); color: var(--white); }
+.nav-item.active {
+  background: rgba(192,57,43,.18);
+  color: var(--gold);
+  border-left-color: var(--gold);
+  font-weight: 600;
+}
+.nav-item .nav-icon { font-size: 1.15rem; width: 22px; text-align: center; }
+.nav-item .nav-badge {
+  margin-left: auto;
+  background: var(--red); color: var(--white);
+  border-radius: 12px; padding: 1px 7px;
+  font-size: 0.7rem; font-weight: 700;
+}
+.sidebar-footer {
+  margin-top: auto; padding: 14px 18px;
+  border-top: 1px solid rgba(255,255,255,.06);
+  font-size: 0.72rem; color: var(--gray-500);
+}
+
+/* ===== MAIN CONTENT ===== */
+#main {
+  margin-left: var(--sidebar-w);
+  margin-top: var(--header-h);
+  padding: 24px;
+  min-height: calc(100vh - var(--header-h));
+  transition: margin-left var(--transition);
+  flex: 1;
+}
+#main.full { margin-left: 0; }
+
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 22px; flex-wrap: wrap; gap: 12px;
+}
+.page-header h2 {
+  font-size: 1.35rem; font-weight: 700;
+  color: var(--red-dark);
+  display: flex; align-items: center; gap: 8px;
+}
+.page-header p { color: var(--gray-600); font-size: 0.85rem; margin-top: 2px; }
+
+/* ===== CARDS & STATS ===== */
+.card {
+  background: var(--white); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 20px;
+}
+.card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px; padding-bottom: 12px;
+  border-bottom: 2px solid var(--gray-100);
+}
+.card-title {
+  font-size: 1rem; font-weight: 700; color: var(--gray-800);
+  display: flex; align-items: center; gap: 8px;
+}
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 22px; }
+.stat-card {
+  background: var(--white); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 18px 20px;
+  display: flex; align-items: center; gap: 16px;
+  border-left: 4px solid var(--red);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.stat-card.gold  { border-left-color: var(--gold-dark); }
+.stat-card.green { border-left-color: var(--success); }
+.stat-card.blue  { border-left-color: var(--info); }
+.stat-card.red   { border-left-color: var(--danger); }
+.stat-icon {
+  width: 48px; height: 48px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; flex-shrink: 0;
+}
+.stat-icon.red-bg   { background: rgba(192,57,43,.12); }
+.stat-icon.gold-bg  { background: rgba(241,196,15,.15); }
+.stat-icon.green-bg { background: rgba(39,174,96,.12); }
+.stat-icon.blue-bg  { background: rgba(41,128,185,.12); }
+.stat-info .stat-number { font-size: 1.9rem; font-weight: 800; line-height: 1; }
+.stat-info .stat-label  { font-size: 0.8rem; color: var(--gray-500); margin-top: 3px; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* ===== BUTTONS ===== */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: 7px;
+  font-size: 0.875rem; font-weight: 600;
+  border: none; transition: all var(--transition);
+  white-space: nowrap; text-decoration: none;
+}
+.btn-sm { padding: 5px 11px; font-size: 0.8rem; border-radius: 5px; }
+.btn-lg { padding: 11px 22px; font-size: 1rem; }
+.btn-primary { background: var(--red); color: var(--white); }
+.btn-primary:hover { background: var(--red-dark); }
+.btn-success { background: var(--success); color: var(--white); }
+.btn-warning { background: var(--warning); color: var(--white); }
+.btn-info    { background: var(--info); color: var(--white); }
+.btn-danger  { background: var(--danger); color: var(--white); }
+.btn-outline { background: transparent; border: 1.5px solid var(--gray-300); color: var(--gray-700); }
+.btn-outline:hover { border-color: var(--red); color: var(--red); background: rgba(192,57,43,.04); }
+
+/* ===== TABLE ===== */
+.table-wrapper { overflow-x: auto; border-radius: var(--radius); }
+table { width: 100%; border-collapse: collapse; min-width: 560px; }
+thead tr { background: linear-gradient(135deg, var(--red-dark), var(--red)); }
+thead th {
+  padding: 12px 14px; text-align: left;
+  font-size: 0.82rem; font-weight: 700;
+  color: var(--white); letter-spacing: .5px;
+  white-space: nowrap;
+}
+tbody tr { border-bottom: 1px solid var(--gray-100); transition: background var(--transition); }
+tbody tr:hover { background: rgba(192,57,43,.04); }
+tbody td { padding: 11px 14px; font-size: 0.87rem; }
+
+/* ===== BADGES ===== */
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+.badge-new      { background: #e8f4fd; color: var(--info); }
+.badge-process  { background: #fef9e7; color: #d68910; }
+.badge-done     { background: #e9f7ef; color: var(--success); }
+.badge-reject   { background: #fdedec; color: var(--danger); }
+
+/* ===== FILTER BAR ===== */
+.filter-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+.filter-bar input, .filter-bar select {
+  padding: 8px 12px; border: 1.5px solid var(--gray-300);
+  border-radius: 7px; font-size: 0.875rem; outline: none; background: var(--white);
+}
+.filter-bar input:focus, .filter-bar select:focus { border-color: var(--red); }
+.filter-bar input { flex: 1; min-width: 180px; }
+
+/* ===== PROCESS STEPS ===== */
+.steps-container { display: flex; flex-direction: column; gap: 14px; }
+.step-item {
+  display: flex; align-items: flex-start; gap: 16px;
+  background: var(--white); border-radius: var(--radius);
+  padding: 16px; box-shadow: var(--shadow);
+  border-left: 4px solid var(--gray-300);
+}
+.step-item.done { border-left-color: var(--success); }
+.step-item.active { border-left-color: var(--gold-dark); }
+.step-num {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 1rem; flex-shrink: 0;
+  background: var(--gray-200); color: var(--gray-600);
+}
+.step-item.done .step-num { background: var(--success); color: var(--white); }
+.step-item.active .step-num { background: var(--gold); color: var(--red-dark); }
+.step-content { flex: 1; }
+.step-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; }
+.step-desc  { font-size: 0.82rem; color: var(--gray-500); }
+.step-forms { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.step-form-tag {
+  background: rgba(192,57,43,.08); color: var(--red);
+  border: 1px solid rgba(192,57,43,.2);
+  border-radius: 5px; padding: 2px 8px; font-size: 0.75rem; font-weight: 600;
+}
+
+/* ===== FORMS GRID ===== */
+.forms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.form-card {
+  background: var(--white); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 18px;
+  display: flex; flex-direction: column; gap: 10px;
+  border-top: 3px solid var(--red);
+}
+.form-card-num {
+  display: inline-flex; align-items: center;
+  background: var(--red); color: var(--white);
+  border-radius: 6px; padding: 3px 10px;
+  font-size: 0.75rem; font-weight: 700; width: fit-content;
+}
+.form-card-name { font-weight: 700; font-size: 0.92rem; line-height: 1.4; }
+.form-card-desc { font-size: 0.8rem; color: var(--gray-500); flex: 1; }
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(0,0,0,.5); backdrop-filter: blur(2px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px; opacity: 0; pointer-events: none;
+  transition: opacity var(--transition);
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--white); border-radius: 14px;
+  box-shadow: var(--shadow-lg); width: 100%; max-width: 580px; max-height: 90vh;
+  overflow-y: auto; transform: scale(.95); transition: transform var(--transition);
+}
+.modal-overlay.open .modal { transform: scale(1); }
+.modal-lg { max-width: 820px; }
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 22px; border-bottom: 2px solid var(--gray-100);
+  position: sticky; top: 0; background: var(--white); z-index: 1;
+}
+.modal-header h3 { font-size: 1.05rem; font-weight: 700; color: var(--red-dark); }
+.modal-close { background: none; border: none; font-size: 1.4rem; color: var(--gray-500); cursor: pointer; }
+.modal-body { padding: 22px; }
+.modal-footer {
+  padding: 14px 22px; border-top: 1px solid var(--gray-100);
+  display: flex; justify-content: flex-end; gap: 10px;
+  position: sticky; bottom: 0; background: var(--white);
+}
+
+.form-group { margin-bottom: 16px; }
+.form-label { display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--gray-700); }
+.form-control {
+  width: 100%; padding: 9px 12px; border: 1.5px solid var(--gray-300);
+  border-radius: 7px; font-size: 0.9rem; outline: none;
+}
+.form-control:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(192,57,43,.1); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-hint { font-size: 0.77rem; color: var(--gray-500); margin-top: 4px; }
+
+/* ===== TOAST ===== */
+#toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+.toast {
+  background: var(--gray-800); color: var(--white);
+  border-radius: 10px; padding: 12px 18px; font-size: 0.88rem; box-shadow: var(--shadow-lg);
+  display: flex; align-items: center; gap: 10px; min-width: 240px; max-width: 380px;
+  animation: toastIn .3s ease;
+}
+.toast.success { background: var(--success); }
+.toast.error   { background: var(--danger); }
+.toast.info    { background: var(--info); }
+.toast.warning { background: var(--warning); }
+@keyframes toastIn  { from { opacity:0; transform:translateX(40px); } to { opacity:1; transform:none; } }
+
+/* ===== TRACK 10 STEPS ===== */
+.process-track { display: flex; gap: 0; margin: 18px 0; overflow-x: auto; padding-bottom: 8px; }
+.track-step { min-width: 78px; flex: 1; text-align: center; position: relative; padding-top: 8px; }
+.track-step::before { content: ''; position: absolute; top: 19px; left: -50%; right: 50%; height: 3px; background: var(--gray-300); z-index: 0; }
+.track-step:first-child::before { display: none; }
+.track-step.done::before, .track-step.active::before { background: var(--success); }
+.track-dot {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--gray-300); color: var(--gray-600);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .78rem; font-weight: 700; margin: 0 auto 6px;
+  position: relative; z-index: 1; border: 2px solid var(--gray-300);
+}
+.track-step.done .track-dot  { background: var(--success); color: var(--white); border-color: var(--success); }
+.track-step.active .track-dot { background: var(--gold); color: var(--red-dark); border-color: var(--gold-dark); }
+.track-step .track-label { font-size: .65rem; color: var(--gray-500); line-height: 1.2; }
+
+/* ===== LOADING OVERLAY ===== */
+#loading-overlay {
+  position: fixed; inset: 0; z-index: 99999;
+  background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(2px);
+  display: none; align-items: center; justify-content: center; flex-direction: column; gap: 12px;
+}
+.spinner {
+  width: 44px; height: 44px; border: 4px solid var(--gray-300);
+  border-top-color: var(--red); border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.page { display: none; }
+.page.active { display: block; }
+.empty-state { text-align: center; padding: 48px 24px; color: var(--gray-400); }
+.empty-state .es-icon { font-size: 3.5rem; margin-bottom: 12px; }
+.divider { height: 1px; background: var(--gray-200); margin: 16px 0; }
+
+@media (max-width: 720px) {
+  #sidebar { transform: translateX(-100%); }
+  #sidebar.open { transform: none; }
+  #main { margin-left: 0 !important; }
+  .btn-menu-toggle { display: block; }
+  .grid-2 { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <div style="font-weight:600; color:var(--red-dark);" id="loading-msg">Đang kết nối Google Sheets...</div>
+</div>
+
+<div id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<!-- HEADER -->
+<header id="header">
+  <div class="header-left">
+    <button class="btn-menu-toggle" onclick="toggleSidebar()">☰</button>
+    <div class="header-logo">⭐</div>
+    <div class="header-title">
+      <h1>Phần mềm Quản lý Phát triển Đảng viên</h1>
+      <p>Chi bộ Hệ thống Thông tin Trường — HTTT</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="header-badge">☁️ Google Sheets Sync</span>
+  </div>
+</header>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Tổng quan</div>
+    <div class="nav-item active" onclick="navigate('dashboard')">
+      <span class="nav-icon">📊</span> Dashboard
+    </div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Quản lý</div>
+    <div class="nav-item" onclick="navigate('profiles')">
+      <span class="nav-icon">👥</span> Quản lý Hồ sơ
+      <span class="nav-badge" id="nav-badge-profiles">0</span>
+    </div>
+    <div class="nav-item" onclick="navigate('process')">
+      <span class="nav-icon">🔄</span> Quy trình 10 Bước
+    </div>
+    <div class="nav-item" onclick="navigate('forms')">
+      <span class="nav-icon">📋</span> Biểu mẫu &amp; Hồ sơ
+    </div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Phân tích</div>
+    <div class="nav-item" onclick="navigate('report')">
+      <span class="nav-icon">📈</span> Báo cáo &amp; Thống kê
+    </div>
+  </div>
+  <div class="sidebar-footer">
+    <div>🏛️ Chi bộ HTTT — v3.0 Cloud</div>
+    <div id="sf-time" style="margin-top:4px;"></div>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main id="main">
+
+  <!-- DASHBOARD -->
+  <div id="page-dashboard" class="page active">
+    <div class="page-header">
+      <div>
+        <h2>📊 Dashboard Tổng quan</h2>
+        <p>Dữ liệu lưu trữ tập trung trực tiếp từ Google Sheets</p>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-outline" onclick="fetchCloudData()">🔄 Tải lại dữ liệu</button>
+        <button class="btn btn-primary" onclick="openAddProfile()">➕ Thêm Hồ sơ Mới</button>
+      </div>
+    </div>
+    <div class="stats-grid" id="dash-stats"></div>
+    <div class="grid-2" style="margin-bottom:20px;">
+      <div class="card">
+        <div class="card-header"><span class="card-title">📊 Biểu đồ Trạng thái</span></div>
+        <div id="dash-chart" style="display:flex;gap:4px;align-items:flex-end;height:150px;padding-top:30px;"></div>
+        <div id="dash-chart-labels" style="display:flex;gap:4px;margin-top:8px;"></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📅 Hồ sơ Gần Nhất</span>
+          <button class="btn btn-sm btn-outline" onclick="navigate('profiles')">Xem tất cả</button>
+        </div>
+        <div id="dash-recent"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">🔄 Quy trình 10 Bước chuẩn Chi bộ</span>
+        <button class="btn btn-sm btn-outline" onclick="navigate('process')">Chi tiết</button>
+      </div>
+      <div class="steps-container" id="dash-steps"></div>
+    </div>
+  </div>
+
+  <!-- PROFILES -->
+  <div id="page-profiles" class="page">
+    <div class="page-header">
+      <div>
+        <h2>👥 Quản lý Hồ sơ</h2>
+        <p>Danh sách lưu trên Google Sheets</p>
+      </div>
+      <button class="btn btn-primary" onclick="openAddProfile()">➕ Thêm Hồ sơ Mới</button>
+    </div>
+    <div class="card">
+      <div class="filter-bar">
+        <input type="text" id="search-input" placeholder="🔍 Tìm kiếm tên, đơn vị..." oninput="renderProfileTable()">
+        <select id="filter-status" onchange="renderProfileTable()">
+          <option value="">Tất cả trạng thái</option>
+          <option value="new">Mới nộp</option>
+          <option value="process">Đang xử lý</option>
+          <option value="done">Hoàn thành</option>
+          <option value="reject">Từ chối</option>
+        </select>
+        <select id="filter-step" onchange="renderProfileTable()">
+          <option value="">Tất cả bước (1–10)</option>
+          <option value="1">Bước 1</option>
+          <option value="2">Bước 2</option>
+          <option value="3">Bước 3</option>
+          <option value="4">Bước 4</option>
+          <option value="5">Bước 5</option>
+          <option value="6">Bước 6</option>
+          <option value="7">Bước 7</option>
+          <option value="8">Bước 8</option>
+          <option value="9">Bước 9</option>
+          <option value="10">Bước 10</option>
+        </select>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>Họ và Tên</th><th>Ngày sinh</th><th>Đơn vị / Lớp</th>
+              <th>Ngày nộp</th><th>Bước</th><th>Trạng thái</th><th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="profile-table-body"></tbody>
+        </table>
+      </div>
+      <div id="profile-empty" class="empty-state" style="display:none;">
+        <div class="es-icon">📭</div>
+        <p>Chưa có hồ sơ nào trong Google Sheet.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROCESS -->
+  <div id="page-process" class="page">
+    <div class="page-header">
+      <div>
+        <h2>🔄 Quy trình Kết nạp Đảng viên</h2>
+        <p>10 bước theo quy định nghiệp vụ</p>
+      </div>
+    </div>
+    <div class="card mb-16">
+      <div class="card-header"><span class="card-title">📑 Sơ đồ 10 bước</span></div>
+      <div class="steps-container" id="process-steps-full"></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">👤 Theo dõi từng Hồ sơ</span></div>
+      <div class="filter-bar">
+        <select id="process-profile-select" onchange="renderProfileProcess()">
+          <option value="">-- Chọn hồ sơ --</option>
+        </select>
+      </div>
+      <div id="process-profile-detail"></div>
+    </div>
+  </div>
+
+  <!-- FORMS (1 Link Drive duy nhất) -->
+  <div id="page-forms" class="page">
+    <div class="page-header">
+      <div>
+        <h2>📋 Biểu mẫu &amp; Thành phần Hồ sơ</h2>
+        <p>12 biểu mẫu &amp; giấy tờ chuẩn hóa</p>
+      </div>
+      <a href="https://drive.google.com/drive/folders/1eTaEr_rgznw7fgInDNsCnlUL9HNd1APh" target="_blank" class="btn btn-primary btn-lg">
+        📁 Mở thư mục tải trọn bộ Biểu mẫu (Google Drive)
+      </a>
+    </div>
+    <div class="forms-grid" id="forms-grid"></div>
+  </div>
+
+  <!-- REPORT -->
+  <div id="page-report" class="page">
+    <div class="page-header">
+      <div>
+        <h2>📈 Báo cáo &amp; Thống kê</h2>
+        <p>Tổng hợp tình hình phát triển Đảng viên</p>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-outline" onclick="window.print()">🖨️ In Báo cáo</button>
+        <button class="btn btn-primary" onclick="exportReport()">📥 Xuất CSV</button>
+      </div>
+    </div>
+    <div id="report-content"></div>
+  </div>
+
+</main>
+
+<div id="toast-container"></div>
+
+<!-- MODAL ADD/EDIT -->
+<div class="modal-overlay" id="modal-add-profile">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-profile-title">➕ Thêm Hồ sơ Mới</h3>
+      <button class="modal-close" onclick="closeModal('modal-add-profile')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-id">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Họ và tên *</label>
+          <input class="form-control" id="inp-name" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ngày sinh *</label>
+          <input class="form-control" type="date" id="inp-dob" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Giới tính</label>
+          <select class="form-control" id="inp-gender">
+            <option value="Nam">Nam</option><option value="Nữ">Nữ</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Số điện thoại</label>
+          <input class="form-control" id="inp-phone">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Đơn vị / Lớp *</label>
+        <input class="form-control" id="inp-unit" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-control" type="email" id="inp-email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Địa chỉ</label>
+        <input class="form-control" id="inp-address">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Trình độ học vấn</label>
+          <select class="form-control" id="inp-edu">
+            <option value="Đại học">Đại học</option><option value="Cao đẳng">Cao đẳng</option>
+            <option value="Thạc sĩ">Thạc sĩ</option><option value="Tiến sĩ">Tiến sĩ</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ngày nộp</label>
+          <input class="form-control" type="date" id="inp-submit-date">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Đảng viên giới thiệu 1</label>
+        <input class="form-control" id="inp-ref1">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Đảng viên giới thiệu 2</label>
+        <input class="form-control" id="inp-ref2">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Ghi chú</label>
+        <textarea class="form-control" id="inp-note" rows="3"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-add-profile')">Hủy</button>
+      <button class="btn btn-primary" onclick="saveProfile()">💾 Lưu vào Google Sheet</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DETAIL -->
+<div class="modal-overlay" id="modal-detail">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3 id="detail-title">📄 Chi tiết Hồ sơ</h3>
+      <button class="modal-close" onclick="closeModal('modal-detail')">✕</button>
+    </div>
+    <div class="modal-body" id="detail-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-detail')">Đóng</button>
+      <button class="btn btn-warning" id="detail-edit-btn">✏️ Chỉnh sửa</button>
+      <button class="btn btn-primary" id="detail-next-btn">▶ Bước tiếp theo</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL GUIDE -->
+<div class="modal-overlay" id="modal-form-guide">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="guide-title">📋 Hướng dẫn điền mẫu</h3>
+      <button class="modal-close" onclick="closeModal('modal-form-guide')">✕</button>
+    </div>
+    <div class="modal-body" id="guide-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-form-guide')">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRM DELETE -->
+<div class="modal-overlay" id="modal-confirm-delete">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header">
+      <h3>⚠️ Xác nhận Xóa</h3>
+      <button class="modal-close" onclick="closeModal('modal-confirm-delete')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>Bạn có chắc muốn xóa hồ sơ của <strong id="delete-name"></strong> khỏi Google Sheet?</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-confirm-delete')">Hủy</button>
+      <button class="btn btn-danger" id="confirm-delete-btn">🗑️ Xóa vĩnh viễn</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL UPDATE STATUS -->
+<div class="modal-overlay" id="modal-update-status">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header">
+      <h3>🔄 Cập nhật Trạng thái</h3>
+      <button class="modal-close" onclick="closeModal('modal-update-status')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Trạng thái mới</label>
+        <select class="form-control" id="inp-new-status">
+          <option value="new">🆕 Mới nộp</option>
+          <option value="process">⏳ Đang xử lý</option>
+          <option value="done">✅ Hoàn thành</option>
+          <option value="reject">❌ Từ chối</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Ghi chú cập nhật</label>
+        <textarea class="form-control" id="inp-status-note" rows="3"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-update-status')">Hủy</button>
+      <button class="btn btn-primary" onclick="confirmUpdateStatus()">✔ Cập nhật</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ============================================================
+// Nội dung trong file MA.gs
+// ============================================================
+// Thay thế bằng ID Google Sheet của bạn
+const SPREADSHEET_ID = "1we1D5sHmVPYNAxyl0tAOD1CK7pQl3OGIjundS-O7pXI";
+const SHEET_NAME = "HoSo";
+
+/**
+ * Upload tệp vào cùng thư mục chứa Google Sheet
+ * @param {string} profileId - ID của Đảng viên
+ * @param {number} stepIndex - Bước tương ứng (0 - 9)
+ * @param {string} base64Data - Dữ liệu tệp mã hóa base64
+ * @param {string} fileName - Tên tệp
+ * @param {string} mimeType - Loại tệp
+ */
+function apiUploadStepFile(profileId, stepIndex, base64Data, fileName, mimeType) {
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const ssFile = DriveApp.getFileById(SPREADSHEET_ID);
+    const parents = ssFile.getParents();
+    const parentFolder = parents.hasNext() ? parents.next() : DriveApp.getRootFolder();
+    
+    const profiles = apiGetProfiles();
+    const p = profiles.find(item => item.id === profileId);
+    if (!p) throw new Error("Không tìm thấy hồ sơ Đảng viên!");
+
+    // --- ĐẶT TÊN THƯ MỤC KHÔNG DẤU CHUẨN ĐẸP ---
+    // Ví dụ: Nguyễn Văn An -> HS_Nguyen_Van_An_HS123
+    const tenKhongDau = xoaDauTiengViet_(p.name);
+    const folderName = "HS_" + tenKhongDau + "_" + p.id;
+    
+    let targetFolder;
+    const existingFolders = parentFolder.getFoldersByName(folderName);
+    if (existingFolders.hasNext()) {
+      targetFolder = existingFolders.next();
+    } else {
+      targetFolder = parentFolder.createFolder(folderName);
+    }
+
+    // Chuẩn hóa cả tên tệp tải lên (loại bỏ ký tự lạ nếu có)
+    const cleanFileName = "B" + (stepIndex + 1) + "_" + fileName;
+
+    const decoded = Utilities.base64Decode(base64Data);
+    const blob = Utilities.newBlob(decoded, mimeType, cleanFileName);
+    const createdFile = targetFolder.createFile(blob);
+    
+    createdFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    const fileUrl = createdFile.getUrl();
+
+    if (!p.steps) p.steps = Array.from({length: 10}, () => ({done: false, note: '', date: ''}));
+    if (!p.steps[stepIndex]) p.steps[stepIndex] = {done: false, note: '', date: ''};
+    
+    p.steps[stepIndex].fileUrl = fileUrl;
+    p.steps[stepIndex].fileName = cleanFileName;
+    p.steps[stepIndex].done = true;
+    p.steps[stepIndex].date = Utilities.formatDate(new Date(), "GMT+7", "yyyy-MM-dd");
+
+    if (p.currentStep === stepIndex + 1 && stepIndex + 1 < 10) {
+      p.currentStep = stepIndex + 2;
+      p.status = 'process';
+    } else if (stepIndex + 1 === 10) {
+      p.currentStep = 10;
+      p.status = 'done';
+    }
+
+    apiSaveProfile(p);
+
+    return {
+      success: true,
+      fileUrl: fileUrl,
+      fileName: cleanFileName
+    };
+  } catch (err) {
+    throw new Error("Lỗi tải tệp: " + err.message);
+  }
+}
+
+/**
+ * Chuyển đổi chuỗi tiếng Việt có dấu thành không dấu và chuẩn hóa cho tên thư mục
+ */
+function xoaDauTiengViet_(str) {
+  if (!str) return "NguoiDung";
+  str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
+  str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e");
+  str = str.replace(/ì|í|ị|ỉ|ĩ/g, "i");
+  str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o");
+  str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u");
+  str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
+  str = str.replace(/đ/g, "d");
+  str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, "A");
+  str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, "E");
+  str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, "I");
+  str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, "O");
+  str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, "U");
+  str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, "Y");
+  str = str.replace(/Đ/g, "D");
+  
+  // Xóa các ký tự đặc biệt còn lại, chỉ giữ chữ cái, số và khoảng trắng
+  str = str.replace(/[^a-zA-Z0-9\s]/g, "");
+  // Thay thế khoảng trắng liên tiếp bằng 1 dấu gạch dưới
+  return str.trim().replace(/\s+/g, "_");
+}
+
+function doGet() {
+  return HtmlService.createHtmlOutputFromFile('Index')
+    .setTitle('Quản lý Phát triển Đảng viên - Chi bộ HTTT')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+/** Tự động chuẩn bị Sheet và hàng tiêu đề */
+function getSheet_() {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  let sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(SHEET_NAME);
+    sheet.appendRow([
+      "id", "Họ Tên (MSSV)", "Ngày sinh", "Giới tính", "Số điện thoại", "Lớp", 
+      "Email", "Địa chỉ", "Trình độ", "submitDate", "Người giới thiệu 1", 
+      "ref2", "note", "status", "currentStep", "stepsJSON", "createdAt"
+    ]);
+  }
+  return sheet;
+}
+
+/** Lấy toàn bộ danh sách hồ sơ từ Google Sheets */
+function apiGetProfiles() {
+  try {
+    const sheet = getSheet_();
+    const data = sheet.getDataRange().getValues();
+    if (data.length <= 1) return []; // Chỉ có dòng tiêu đề
+
+    const profiles = [];
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      let steps = [];
+      try {
+        steps = JSON.parse(row[15]);
+      } catch (e) {
+        steps = Array.from({length: 10}, () => ({done: false, note: '', date: ''}));
+      }
+
+      profiles.push({
+        id: String(row[0]),
+        name: String(row[1]),
+        dob: row[2] instanceof Date ? Utilities.formatDate(row[2], "GMT+7", "yyyy-MM-dd") : String(row[2]),
+        gender: String(row[3]),
+        phone: String(row[4]),
+        unit: String(row[5]),
+        email: String(row[6]),
+        address: String(row[7]),
+        edu: String(row[8]),
+        submitDate: row[9] instanceof Date ? Utilities.formatDate(row[9], "GMT+7", "yyyy-MM-dd") : String(row[9]),
+        ref1: String(row[10]),
+        ref2: String(row[11]),
+        note: String(row[12]),
+        status: String(row[13]),
+        currentStep: Number(row[14]) || 1,
+        steps: steps,
+        createdAt: String(row[16])
+      });
+    }
+    return profiles;
+  } catch (err) {
+    throw new Error("Lỗi đọc Google Sheet: " + err.message);
+  }
+}
+
+/** Thêm mới hoặc cập nhật hồ sơ vào Google Sheets */
+function apiSaveProfile(profile) {
+  try {
+    const sheet = getSheet_();
+    const data = sheet.getDataRange().getValues();
+    let rowIndex = -1;
+
+    for (let i = 1; i < data.length; i++) {
+      if (String(data[i][0]) === String(profile.id)) {
+        rowIndex = i + 1;
+        break;
+      }
+    }
+
+    const rowData = [
+      profile.id,
+      profile.name,
+      profile.dob,
+      profile.gender,
+      profile.phone,
+      profile.unit,
+      profile.email,
+      profile.address,
+      profile.edu,
+      profile.submitDate,
+      profile.ref1,
+      profile.ref2,
+      profile.note,
+      profile.status,
+      profile.currentStep,
+      JSON.stringify(profile.steps || []),
+      profile.createdAt || new Date().toISOString()
+    ];
+
+    if (rowIndex > 0) {
+      sheet.getRange(rowIndex, 1, 1, rowData.length).setValues([rowData]);
+    } else {
+      sheet.appendRow(rowData);
+    }
+    return { success: true };
+  } catch (err) {
+    throw new Error("Lỗi ghi dữ liệu: " + err.message);
+  }
+}
+
+/** Xóa hồ sơ khỏi Google Sheets */
+function apiDeleteProfile(id) {
+  try {
+    const sheet = getSheet_();
+    const data = sheet.getDataRange().getValues();
+    for (let i = 1; i < data.length; i++) {
+      if (String(data[i][0]) === String(id)) {
+        sheet.deleteRow(i + 1);
+        return { success: true };
+      }
+    }
+    return { success: false, message: "Không tìm thấy hồ sơ" };
+  } catch (err) {
+    throw new Error("Lỗi khi xóa: " + err.message);
+  }
+}
+
+/**hàm kích hoạt kiểm tra quyền */
+function triggerDrivePermission() {
+  // Gọi lệnh tạo thư mục tạm để kích hoạt quyền ghi đầy đủ (auth/drive)
+  const testFolder = DriveApp.createFolder("Test_Permission_Temp");
+  Logger.log("Đã tạo thư mục kiểm tra: " + testFolder.getName());
+  
+  // Xóa ngay thư mục tạm để không làm rác Drive
+  testFolder.setTrashed(true);
+  Logger.log("Đã cấp quyền ghi Drive thành công!");
+}
+
+// ============================================================
+// 12 BIỂU MẪU & THÀNH PHẦN HỒ SƠ
+// ============================================================
+const FORMS_DATA = [
+  { id: 'Mau-CN-NTVD', step: 1, name: 'Giấy chứng nhận học lớp Nhận thức về Đảng', desc: 'Do Cấp ủy hoặc Trung tâm Chính trị cấp.' },
+  { id: 'Mau-1-KND',   step: 2, name: 'Đơn xin vào Đảng', desc: 'Tự viết tay toàn bộ, trình bày lý do, nguyện vọng.' },
+  { id: 'Mau-2-KND',   step: 3, name: 'Lý lịch của người xin vào Đảng', desc: 'Khai chi tiết hoàn cảnh bản thân và gia đình.' },
+  { id: 'Mau_3_KND',   step: 4, name: 'Giấy giới thiệu (1 Đảng viên)', desc: 'Đảng viên chính thức giúp đỡ nhận xét, giới thiệu.' },
+  { id: 'Mau_3A_KND',  step: 4, name: 'Giấy giới thiệu (2 Đảng viên)', desc: 'Áp dụng đối với người không còn là Đoàn viên.' },
+  { id: 'Mau_4_KND',   step: 5, name: 'Nghị quyết Đoàn cơ sở', desc: 'Nghị quyết của BCH Đoàn trường/khoa giới thiệu.' },
+  { id: 'Mau_4_1_KND', step: 5, name: 'Nghị quyết Chi Đoàn', desc: 'Biểu quyết đề nghị của Chi đoàn trực tiếp sinh hoạt.' },
+  { id: 'Mau_5_KND',   step: 6, name: 'Tổng hợp ý kiến nhận xét', desc: 'Chi ủy tổng hợp ý kiến đoàn thể và nơi cư trú.' },
+  { id: 'Mau_5a_KND',  step: 6, name: 'Nhận xét Chi ủy nơi cư trú', desc: 'Bí thư Chi bộ nơi thường trú xác nhận, đóng dấu.' },
+  { id: 'Mau_5b_KND',  step: 6, name: 'Nhận xét của tổ chức Đoàn thể', desc: 'Công đoàn hoặc Đoàn thanh niên nơi sinh hoạt nhận xét.' },
+  { id: 'Mau_6_KND',   step: 7, name: 'Nghị quyết đề nghị kết nạp của Chi bộ', desc: 'Chi bộ họp biểu quyết bằng phiếu kín gửi Đảng ủy.' },
+  { id: 'Bang-Diem',   step: 8, name: 'Bảng điểm học tập mới nhất', desc: 'Bản in có xác nhận của Phòng Đào tạo (đối với SV).' }
+];
+
+// ============================================================
+// QUY TRÌNH 10 BƯỚC
+// ============================================================
+const PROCESS_STEPS = [
+  { num: 1,  title: 'Bước 1: Giấy chứng nhận NTVĐ', desc: 'Nộp Giấy chứng nhận bồi dưỡng nhận thức về Đảng.', forms: ['Mẫu CN-NTVĐ'], duration: 'Đã hoàn thành' },
+  { num: 2,  title: 'Bước 2: Đơn xin vào Đảng', desc: 'Viết tay nộp Đơn xin vào Đảng (Mẫu 1-KNĐ).', forms: ['Mẫu 1-KNĐ'], duration: '1–2 tuần' },
+  { num: 3,  title: 'Bước 3: Khai Lý lịch', desc: 'Khai Lý lịch người vào Đảng (Mẫu 2-KNĐ) và tiến hành thẩm tra.', forms: ['Mẫu 2-KNĐ'], duration: '2–4 tuần' },
+  { num: 4,  title: 'Bước 4: Giấy giới thiệu', desc: 'Đảng viên chính thức làm Giấy giới thiệu (Mẫu 3 hoặc 3A).', forms: ['Mẫu 3', 'Mẫu 3A'], duration: '1–2 tuần' },
+  { num: 5,  title: 'Bước 5: NQ giới thiệu của Đoàn', desc: 'Đoàn Thanh niên họp ra Nghị quyết giới thiệu (Mẫu 4, 4.1).', forms: ['Mẫu 4', 'Mẫu 4.1'], duration: '2–3 tuần' },
+  { num: 6,  title: 'Bước 6: Tổng hợp nhận xét', desc: 'Lấy ý kiến nhận xét đoàn thể và nơi cư trú (Mẫu 5, 5a, 5b).', forms: ['Mẫu 5', '5a', '5b'], duration: '3–4 tuần' },
+  { num: 7,  title: 'Bước 7: NQ đề nghị của Chi bộ', desc: 'Chi bộ họp biểu quyết ra Nghị quyết đề nghị kết nạp (Mẫu 6).', forms: ['Mẫu 6-KNĐ'], duration: '1–2 tuần' },
+  { num: 8,  title: 'Bước 8: Nộp Bảng điểm', desc: 'Nộp bảng điểm tích lũy có dấu xác nhận (đối với sinh viên).', forms: ['Bảng điểm'], duration: '1 tuần' },
+  { num: 9,  title: 'Bước 9: Chuẩn y kết nạp', desc: 'Đảng ủy cơ sở thẩm định và ban hành Quyết định kết nạp.', forms: [], duration: '2–4 tuần' },
+  { num: 10, title: 'Bước 10: Tổ chức Lễ kết nạp', desc: 'Chi bộ tổ chức Lễ kết nạp Đảng viên mới trang trọng.', forms: [], duration: 'Theo quyết định' }
+];
+
+// BIẾN LƯU DỮ LIỆU ĐỒNG BỘ CLOUD
+let cachedProfiles = [];
+let currentPage = 'dashboard';
+
+function showLoading(msg = 'Đang tải...') {
+  document.getElementById('loading-msg').textContent = msg;
+  document.getElementById('loading-overlay').style.display = 'flex';
+}
+function hideLoading() {
+  document.getElementById('loading-overlay').style.display = 'none';
+}
+
+function showToast(msg, type = 'success') {
+  const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
+  const tc = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${icons[type]||'💬'}</span> <span>${msg}</span>`;
+  tc.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+function fmtDate(dateStr) {
+  if (!dateStr) return '—';
+  try {
+    const [y, m, d] = dateStr.split('T')[0].split('-');
+    return `${d}/${m}/${y}`;
+  } catch { return dateStr; }
+}
+function today() {
+  return new Date().toISOString().split('T')[0];
+}
+function statusLabel(s) {
+  const map = {
+    new:     '<span class="badge badge-new">🆕 Mới nộp</span>',
+    process: '<span class="badge badge-process">⏳ Đang xử lý</span>',
+    done:    '<span class="badge badge-done">✅ Hoàn thành</span>',
+    reject:  '<span class="badge badge-reject">❌ Từ chối</span>'
+  };
+  return map[s] || s;
+}
+
+// ============================================================
+// ĐỒNG BỘ DỮ LIỆU GOOGLE SHEETS
+// ============================================================
+function fetchCloudData() {
+  showLoading('Đang đồng bộ dữ liệu từ Google Sheet...');
+  google.script.run
+    .withSuccessHandler(function(profiles) {
+      cachedProfiles = profiles || [];
+      hideLoading();
+      renderCurrentPage();
+      showToast('Đồng bộ Google Sheet thành công!', 'success');
+    })
+    .withFailureHandler(function(err) {
+      hideLoading();
+      showToast('Lỗi kết nối Sheet: ' + err.message, 'error');
+    })
+    .apiGetProfiles();
+}
+
+function renderCurrentPage() {
+  if (currentPage === 'dashboard') renderDashboard();
+  if (currentPage === 'profiles')  renderProfileTable();
+  if (currentPage === 'process')   renderProcess();
+  if (currentPage === 'forms')     renderForms();
+  if (currentPage === 'report')    renderReport();
+  document.getElementById('nav-badge-profiles').textContent = cachedProfiles.length;
+}
+
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const target = document.getElementById('page-' + page);
+  if (target) target.classList.add('active');
+  currentPage = page;
+  closeSidebar();
+  renderCurrentPage();
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDashboard() {
+  const counts = { new: 0, process: 0, done: 0, reject: 0 };
+  cachedProfiles.forEach(p => { if (counts[p.status] !== undefined) counts[p.status]++; });
+
+  document.getElementById('dash-stats').innerHTML = `
+    <div class="stat-card red"><div class="stat-icon red-bg">📁</div><div class="stat-info"><div class="stat-number text-red">${cachedProfiles.length}</div><div class="stat-label">Tổng hồ sơ (Cloud)</div></div></div>
+    <div class="stat-card gold"><div class="stat-icon gold-bg">🆕</div><div class="stat-info"><div class="stat-number" style="color:var(--gold-dark)">${counts.new}</div><div class="stat-label">Mới nộp</div></div></div>
+    <div class="stat-card blue"><div class="stat-icon blue-bg">⏳</div><div class="stat-info"><div class="stat-number" style="color:var(--info)">${counts.process}</div><div class="stat-label">Đang xử lý</div></div></div>
+    <div class="stat-card green"><div class="stat-icon green-bg">✅</div><div class="stat-info"><div class="stat-number text-success">${counts.done}</div><div class="stat-label">Hoàn thành</div></div></div>
+    <div class="stat-card red"><div class="stat-icon red-bg">❌</div><div class="stat-info"><div class="stat-number text-red">${counts.reject}</div><div class="stat-label">Từ chối</div></div></div>
+  `;
+
+  const chartData = [
+    { label: 'Mới', val: counts.new, color: '#f39c12' },
+    { label: 'Xử lý', val: counts.process, color: '#2980b9' },
+    { label: 'Xong', val: counts.done, color: '#27ae60' },
+    { label: 'Từ chối', val: counts.reject, color: '#c0392b' }
+  ];
+  const maxVal = Math.max(...chartData.map(d => d.val), 1);
+  document.getElementById('dash-chart').innerHTML = chartData.map(d => `
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
+      <div style="font-size:.75rem;font-weight:700;color:${d.color}">${d.val}</div>
+      <div style="height:${Math.round((d.val/maxVal)*110)}px;background:${d.color};width:100%;border-radius:4px 4px 0 0;"></div>
+    </div>
+  `).join('');
+  document.getElementById('dash-chart-labels').innerHTML = chartData.map(d =>
+    `<div style="flex:1;text-align:center;font-size:.72rem;color:var(--gray-500);">${d.label}</div>`
+  ).join('');
+
+  const recent = [...cachedProfiles].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0,5);
+  const dr = document.getElementById('dash-recent');
+  if (!recent.length) {
+    dr.innerHTML = '<div class="empty-state"><div class="es-icon">📭</div><p>Chưa có dữ liệu</p></div>';
+  } else {
+    dr.innerHTML = recent.map(p => `
+      <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--gray-100);cursor:pointer" onclick="showDetail('${p.id}')">
+        <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--red),var(--red-light));display:flex;align-items:center;justify-content:center;color:white;font-weight:700;">${p.name.slice(-1)}</div>
+        <div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:.9rem">${p.name}</div><div style="font-size:.75rem;color:var(--gray-500)">${p.unit}</div></div>
+        <div>${statusLabel(p.status)}</div>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('dash-steps').innerHTML = PROCESS_STEPS.map(s => `
+    <div class="step-item">
+      <div class="step-num">${s.num}</div>
+      <div class="step-content">
+        <div class="step-title">${s.title}</div>
+        <div class="step-desc">${s.desc}</div>
+        <div class="step-forms">
+          ${(s.forms || []).map(f => `<span class="step-form-tag">\${f}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// PROFILE TABLE
+// ============================================================
+function renderProfileTable() {
+  const search = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
+  const filterStatus = document.getElementById('filter-status')?.value || '';
+  const filterStep = document.getElementById('filter-step')?.value || '';
+
+  let filtered = cachedProfiles.filter(p => {
+    const matchSearch = !search || p.name.toLowerCase().includes(search) || p.unit.toLowerCase().includes(search);
+    const matchStatus = !filterStatus || p.status === filterStatus;
+    const matchStep = !filterStep || String(p.currentStep) === filterStep;
+    return matchSearch && matchStatus && matchStep;
+  });
+
+  const tbody = document.getElementById('profile-table-body');
+  const empty = document.getElementById('profile-empty');
+  if (!filtered.length) {
+    tbody.innerHTML = ''; empty.style.display = 'block'; return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = filtered.map((p, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td><strong>${p.name}</strong><div style="font-size:.75rem;color:var(--gray-500)">${p.phone || ''}</div></td>
+      <td>${fmtDate(p.dob)}</td>
+      <td title="${p.unit}">${p.unit}</td>
+      <td>${fmtDate(p.submitDate)}</td>
+      <td><span style="font-weight:700;color:var(--red)">Bước ${p.currentStep}/10</span></td>
+      <td>${statusLabel(p.status)}</td>
+      <td>
+        <div style="display:flex;gap:5px;">
+          <button class="btn btn-sm btn-info" onclick="showDetail('${p.id}')">👁 Xem</button>
+          <button class="btn btn-sm btn-warning" onclick="openEditProfile('${p.id}')">✏️</button>
+          <button class="btn btn-sm btn-outline" onclick="openUpdateStatus('${p.id}')">🔄</button>
+          <button class="btn btn-sm btn-danger" onclick="confirmDelete('${p.id}')">🗑️</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ============================================================
+// SAVE / UPDATE PROFILE (LƯU VÀO SHEETS)
+// ============================================================
+function openAddProfile() {
+  document.getElementById('modal-profile-title').textContent = '➕ Thêm Hồ sơ Mới';
+  document.getElementById('edit-id').value = '';
+  ['name','dob','phone','unit','email','address','note','ref1','ref2'].forEach(f => {
+    const el = document.getElementById('inp-' + f); if (el) el.value = '';
+  });
+  document.getElementById('inp-gender').value = 'Nam';
+  document.getElementById('inp-edu').value = 'Đại học';
+  document.getElementById('inp-submit-date').value = today();
+  openModal('modal-add-profile');
+}
+
+function openEditProfile(id) {
+  const p = cachedProfiles.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('modal-profile-title').textContent = '✏️ Chỉnh sửa Hồ sơ';
+  document.getElementById('edit-id').value = p.id;
+  document.getElementById('inp-name').value = p.name || '';
+  document.getElementById('inp-dob').value = p.dob || '';
+  document.getElementById('inp-gender').value = p.gender || 'Nam';
+  document.getElementById('inp-phone').value = p.phone || '';
+  document.getElementById('inp-unit').value = p.unit || '';
+  document.getElementById('inp-email').value = p.email || '';
+  document.getElementById('inp-address').value = p.address || '';
+  document.getElementById('inp-edu').value = p.edu || 'Đại học';
+  document.getElementById('inp-submit-date').value = p.submitDate || '';
+  document.getElementById('inp-ref1').value = p.ref1 || '';
+  document.getElementById('inp-ref2').value = p.ref2 || '';
+  document.getElementById('inp-note').value = p.note || '';
+  closeModal('modal-detail');
+  openModal('modal-add-profile');
+}
+
+function saveProfile() {
+  const name = document.getElementById('inp-name').value.trim();
+  const dob  = document.getElementById('inp-dob').value;
+  const unit = document.getElementById('inp-unit').value.trim();
+  if (!name || !dob || !unit) {
+    showToast('Vui lòng điền đủ Họ tên, Ngày sinh và Đơn vị!', 'warning'); return;
+  }
+
+  const editId = document.getElementById('edit-id').value;
+  let targetProfile = editId ? cachedProfiles.find(p => p.id === editId) : null;
+
+  const profileData = {
+    id: editId || ('HS' + Date.now().toString(36).toUpperCase()),
+    name, dob, unit,
+    gender: document.getElementById('inp-gender').value,
+    phone: document.getElementById('inp-phone').value.trim(),
+    email: document.getElementById('inp-email').value.trim(),
+    address: document.getElementById('inp-address').value.trim(),
+    edu: document.getElementById('inp-edu').value,
+    submitDate: document.getElementById('inp-submit-date').value || today(),
+    ref1: document.getElementById('inp-ref1').value.trim(),
+    ref2: document.getElementById('inp-ref2').value.trim(),
+    note: document.getElementById('inp-note').value.trim(),
+    status: targetProfile ? targetProfile.status : 'new',
+    currentStep: targetProfile ? targetProfile.currentStep : 1,
+    steps: targetProfile ? targetProfile.steps : Array.from({length: 10}, () => ({done: false, note: '', date: ''})),
+    createdAt: targetProfile ? targetProfile.createdAt : new Date().toISOString()
+  };
+
+  showLoading('Đang lưu hồ sơ vào Google Sheet...');
+  closeModal('modal-add-profile');
+
+  google.script.run
+    .withSuccessHandler(function() {
+      hideLoading();
+      showToast('Đã lưu dữ liệu vào Google Sheet thành công!', 'success');
+      fetchCloudData();
+    })
+    .withFailureHandler(function(err) {
+      hideLoading();
+      showToast('Lỗi lưu Sheet: ' + err.message, 'error');
+    })
+    .apiSaveProfile(profileData);
+}
+
+// ============================================================
+// DELETE
+// ============================================================
+let deleteTargetId = null;
+function confirmDelete(id) {
+  const p = cachedProfiles.find(x => x.id === id);
+  if (!p) return;
+  deleteTargetId = id;
+  document.getElementById('delete-name').textContent = p.name;
+  document.getElementById('confirm-delete-btn').onclick = doDelete;
+  openModal('modal-confirm-delete');
+}
+function doDelete() {
+  if (!deleteTargetId) return;
+  showLoading('Đang xóa khỏi Google Sheet...');
+  closeModal('modal-confirm-delete');
+
+  google.script.run
+    .withSuccessHandler(function() {
+      hideLoading();
+      showToast('Đã xóa hồ sơ trên Google Sheet!', 'success');
+      deleteTargetId = null;
+      fetchCloudData();
+    })
+    .withFailureHandler(function(err) {
+      hideLoading();
+      showToast('Lỗi xóa: ' + err.message, 'error');
+    })
+    .apiDeleteProfile(deleteTargetId);
+}
+
+// ============================================================
+// UPDATE STATUS & STEPS (10 BƯỚC)
+// ============================================================
+let statusTargetId = null;
+function openUpdateStatus(id) {
+  statusTargetId = id;
+  const p = cachedProfiles.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('inp-new-status').value = p.status;
+  document.getElementById('inp-status-note').value = '';
+  openModal('modal-update-status');
+}
+function confirmUpdateStatus() {
+  if (!statusTargetId) return;
+  const p = cachedProfiles.find(x => x.id === statusTargetId);
+  if (!p) return;
+  const newStatus = document.getElementById('inp-new-status').value;
+  const note = document.getElementById('inp-status-note').value.trim();
+  p.status = newStatus;
+  if (newStatus === 'done') p.currentStep = 10;
+  if (note) p.note = (p.note ? p.note + '\n' : '') + `[${new Date().toLocaleDateString('vi-VN')}] ${note}`;
+
+  showLoading('Đang cập nhật Google Sheet...');
+  closeModal('modal-update-status');
+  google.script.run
+    .withSuccessHandler(function() {
+      hideLoading();
+      showToast('Đã cập nhật trạng thái!', 'success');
+      statusTargetId = null;
+      fetchCloudData();
+    })
+    .apiSaveProfile(p);
+}
+
+function showDetail(id) {
+  const p = cachedProfiles.find(x => x.id === id);
+  if (!p) return;
+  if (!p.steps || p.steps.length < 10) {
+    p.steps = Array.from({length: 10}, (_, i) => p.steps && p.steps[i] ? p.steps[i] : {done: false, note: '', date: ''});
+  }
+
+  document.getElementById('detail-title').textContent = `📄 Hồ sơ: ${p.name}`;
+  document.getElementById('detail-edit-btn').onclick = () => openEditProfile(id);
+  document.getElementById('detail-next-btn').onclick = () => advanceStep(id);
+
+  const trackHtml = PROCESS_STEPS.map((s, i) => {
+    const isDone = p.steps[i]?.done;
+    const isActive = !isDone && p.currentStep === s.num;
+    return `<div class="track-step ${isDone ? 'done' : isActive ? 'active' : ''}">
+      <div class="track-dot">${isDone ? '✓' : s.num}</div>
+      <div class="track-label">${s.title.replace(/Bước \d+: /,'')}</div>
+    </div>`;
+  }).join('');
+
+  const stepsHtml = PROCESS_STEPS.map((s, i) => {
+    const st = p.steps[i] || {};
+    const isDone = st.done;
+    return `
+      <div class="step-item ${isDone ? 'done' : p.currentStep === s.num ? 'active' : ''}">
+        <div class="step-num">${isDone ? '✓' : s.num}</div>
+        <div class="step-content">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+            <div class="step-title">${s.title}</div>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+              <!-- CHỈ HIỂN THỊ THÔNG BÁO HOÀN THÀNH, KHÔNG HIỂN THỊ NÚT XEM TỆP -->
+              ${isDone ? `<span class="badge badge-done" style="font-size:0.8rem;padding:4px 10px;">✅ Hoàn thành </span>` : ''}
+              ${!isDone && p.status !== 'reject' ? `<button class="btn btn-sm btn-success" onclick="markStepDone('${id}',${i})">✔ Đánh dấu xong</button>` : ''}
+            </div>
+          </div>
+          <div class="step-desc">${s.desc}</div>
+          
+          <!-- KHU VỰC TẢI LÊN FILE: ẨN KHI ĐÃ HOÀN THÀNH -->
+          ${!isDone && p.status !== 'reject' ? `
+            <div class="upload-box" style="margin-top:10px;padding:8px 12px;background:var(--gray-100);border-radius:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <span style="font-size:0.8rem;font-weight:600;color:var(--gray-700);">📤 Đính kèm tệp hồ sơ:</span>
+              <input type="file" class="step-file-input" style="font-size:0.8rem;max-width:220px;">
+              <button class="btn btn-sm btn-primary" onclick="uploadStepFile(this, '${id}', ${i})">Tải lên Drive & Hoàn thành</button>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('detail-body').innerHTML = `
+    <div style="margin-bottom:16px;">
+      <h3>${p.name} — ${p.unit}</h3>
+      <p style="color:var(--gray-600);">${p.gender} · Sinh: ${fmtDate(p.dob)} · SĐT: ${p.phone || '—'} · Email: ${p.email || '—'}</p>
+    </div>
+    <div style="font-weight:700;margin-bottom:8px;color:var(--red-dark);">📊 Tiến trình 10 Bước</div>
+    <div class="process-track">${trackHtml}</div>
+    <div class="divider"></div>
+    <div class="steps-container">${stepsHtml}</div>
+  `;
+  openModal('modal-detail');
+}
+
+
+function uploadStepFile(btnElement, profileId, stepIndex) {
+  // Tìm ô chọn file nằm ngay cạnh nút vừa bấm
+  const container = btnElement.closest('.upload-box');
+  const fileInput = container ? container.querySelector('.step-file-input') : null;
+
+  if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+    showToast("Vui lòng chọn một tệp trước khi tải lên!", "warning");
+    return;
+  }
+
+  const file = fileInput.files[0];
+  if (file.size > 15 * 1024 * 1024) {
+    showToast("Dung lượng tệp không được vượt quá 15MB!", "error");
+    return;
+  }
+
+  showLoading(`Đang tải tệp "${file.name}" lên Google Drive...`);
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const rawData = e.target.result;
+    const base64Data = rawData.split(',')[1];
+
+    google.script.run
+      .withSuccessHandler(function(res) {
+        hideLoading();
+        showToast("Đã tải tệp lên Google Drive thành công!", "success");
+        fetchCloudData(); // Đồng bộ lại dữ liệu Sheet
+        closeModal('modal-detail');
+      })
+      .withFailureHandler(function(err) {
+        hideLoading();
+        showToast("Lỗi khi tải tệp: " + err.message, "error");
+      })
+      .apiUploadStepFile(profileId, stepIndex, base64Data, file.name, file.type);
+  };
+  reader.readAsDataURL(file);
+}
+
+function markStepDone(id, stepIndex) {
+  const p = cachedProfiles.find(x => x.id === id);
+  if (!p) return;
+  p.steps[stepIndex] = { done: true, note: 'Hoàn thành', date: today() };
+  if (p.currentStep === stepIndex + 1 && stepIndex + 1 < 10) {
+    p.currentStep = stepIndex + 2; p.status = 'process';
+  } else if (stepIndex + 1 === 10) {
+    p.currentStep = 10; p.status = 'done';
+  }
+
+  showLoading('Đang lưu tiến trình vào Sheet...');
+  closeModal('modal-detail');
+  google.script.run
+    .withSuccessHandler(function() {
+      hideLoading();
+      showToast(`Đã hoàn thành Bước ${stepIndex + 1}!`, 'success');
+      fetchCloudData();
+    })
+    .apiSaveProfile(p);
+}
+
+function advanceStep(id) {
+  const p = cachedProfiles.find(x => x.id === id);
+  if (!p || p.currentStep >= 10 || p.status === 'reject') return;
+  p.steps[p.currentStep - 1] = { done: true, note: 'Hoàn thành', date: today() };
+  p.currentStep += 1;
+  if (p.currentStep === 10) p.status = 'done';
+
+  showLoading('Đang cập nhật bước tiếp theo...');
+  closeModal('modal-detail');
+  google.script.run
+    .withSuccessHandler(function() {
+      hideLoading();
+      showToast(`Đã chuyển sang Bước ${p.currentStep}!`, 'success');
+      fetchCloudData();
+    })
+    .apiSaveProfile(p);
+}
+
+// ============================================================
+// PROCESS PAGE
+// ============================================================
+function renderProcess() {
+  document.getElementById('process-steps-full').innerHTML = PROCESS_STEPS.map(s => `
+    <div class="step-item">
+      <div class="step-num">${s.num}</div>
+      <div class="step-content">
+        <div class="step-title">${s.title}</div>
+        <div class="step-desc">${s.desc}</div>
+        <div class="step-forms">
+          ${(s.forms || []).map(f => `<span class="step-form-tag">\${f}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  const sel = document.getElementById('process-profile-select');
+  const prevVal = sel.value;
+  sel.innerHTML = '<option value="">-- Chọn hồ sơ --</option>' +
+    cachedProfiles.map(p => `<option value="${p.id}" ${p.id===prevVal?'selected':''}>${p.name} — ${p.unit}</option>`).join('');
+  if (prevVal) renderProfileProcess();
+}
+
+function renderProfileProcess() {
+  const id = document.getElementById('process-profile-select').value;
+  const detail = document.getElementById('process-profile-detail');
+  if (!id) { detail.innerHTML = ''; return; }
+  const p = cachedProfiles.find(x => x.id === id);
+  if (!p) return;
+
+  const trackHtml = PROCESS_STEPS.map((s, i) => {
+    const st = (p.steps && p.steps[i]) || {};
+    const cls = st.done ? 'done' : p.currentStep === s.num ? 'active' : '';
+    return `<div class="track-step ${cls}">
+      <div class="track-dot">${st.done ? '✓' : s.num}</div>
+      <div class="track-label">${s.title.replace(/Bước \d+: /,'')}</div>
+    </div>`;
+  }).join('');
+
+  detail.innerHTML = `
+    <div style="margin-bottom:12px;"><strong>${p.name}</strong> — ${p.unit} | Nộp: ${fmtDate(p.submitDate)} | Hiện tại: Bước ${p.currentStep}/10</div>
+    <div class="process-track">${trackHtml}</div>
+    <button class="btn btn-info" onclick="showDetail('${p.id}')">👁 Xem & Cập nhật chi tiết</button>
+  `;
+}
+
+// ============================================================
+// FORMS PAGE (1 LINK DRIVE)
+// ============================================================
+function renderForms() {
+  document.getElementById('forms-grid').innerHTML = FORMS_DATA.map((f, i) => `
+    <div class="form-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <span class="form-card-num">${f.id}</span>
+        <span style="font-size:.75rem;color:var(--gray-500)">Bước ${f.step}</span>
+      </div>
+      <div class="form-card-name">${f.name}</div>
+      <div class="form-card-desc">${f.desc}</div>
+      <button class="btn btn-sm btn-outline" style="margin-top:auto;" onclick="showFormGuide(${i})">📖 Hướng dẫn chi tiết</button>
+    </div>
+  `).join('');
+}
+
+function showFormGuide(idx) {
+  const f = FORMS_DATA[idx];
+  document.getElementById('guide-title').textContent = `📋 Hướng dẫn — ${f.name}`;
+  document.getElementById('guide-body').innerHTML = `
+    <p><strong>${f.name}</strong> (${f.id})</p>
+    <p style="margin-top:8px;">${f.desc}</p>
+    <div class="divider"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:0.85rem;color:var(--gray-600);">Tải bản mẫu file Word tại thư mục Drive chung:</span>
+      <a href="https://drive.google.com/drive/folders/1eTaEr_rgznw7fgInDNsCnlUL9HNd1APh" target="_blank" class="btn btn-primary">📁 Mở Google Drive</a>
+    </div>
+  `;
+  openModal('modal-form-guide');
+}
+
+// ============================================================
+// REPORT & CSV EXPORT
+// ============================================================
+function renderReport() {
+  const counts = { new: 0, process: 0, done: 0, reject: 0 };
+  cachedProfiles.forEach(p => { if (counts[p.status] !== undefined) counts[p.status]++; });
+  const now = new Date().toLocaleDateString('vi-VN');
+
+  document.getElementById('report-content').innerHTML = `
+    <div class="card">
+      <div style="text-align:center;padding-bottom:12px;border-bottom:2px solid var(--gold);margin-bottom:18px;">
+        <div style="font-size:1.1rem;font-weight:800;color:var(--red-dark);">ĐẢNG CỘNG SẢN VIỆT NAM</div>
+        <div style="font-size:.9rem;color:var(--gray-600);">Chi bộ Hệ thống Thông tin Trường — HTTT</div>
+        <div style="font-size:1.2rem;font-weight:800;margin-top:10px;">BÁO CÁO TÌNH HÌNH PHÁT TRIỂN ĐẢNG VIÊN</div>
+        <div style="font-size:.85rem;color:var(--gray-500);">Dữ liệu đám mây ngày: ${now}</div>
+      </div>
+      <p>Tổng số hồ sơ đang quản lý trên hệ thống: <strong>${cachedProfiles.length}</strong> (Hoàn thành: ${counts.done}, Đang xử lý: ${counts.process}, Mới: ${counts.new}, Từ chối: ${counts.reject})</p>
+    </div>
+  `;
+}
+
+function exportReport() {
+  const statusMap = { new: 'Mới nộp', process: 'Đang xử lý', done: 'Hoàn thành', reject: 'Từ chối' };
+  const rows = [['STT','Họ và Tên','Ngày sinh','Giới tính','Đơn vị','Ngày nộp','Bước','Trạng thái','Ghi chú']];
+  cachedProfiles.forEach((p, i) => {
+    rows.push([i+1, p.name, fmtDate(p.dob), p.gender, p.unit, fmtDate(p.submitDate), `Bước ${p.currentStep}/10`, statusMap[p.status] || p.status, p.note || '']);
+  });
+  const csv = '\uFEFF' + rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `BaoCao_DangVien_${today()}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+  showToast('Đã xuất file CSV!', 'success');
+}
+
+function updateClock() {
+  const el = document.getElementById('sf-time');
+  if (el) el.textContent = new Date().toLocaleString('vi-VN', { weekday: 'short', day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+// KHỞI CHẠY LẦN ĐẦU
+(function init() {
+  updateClock();
+  setInterval(updateClock, 30000);
+  fetchCloudData();
+})();
+</script>
+</body>
+</html>
