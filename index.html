@@ -1,4 +1,67 @@
+<script>
+// CHỈNH SỬA / THAY THẾ HÀM doget MỚI ĐỂ PHỤC VỤ REQ TỪ GITHUB
+function doGet(e) {
+  try {
+    const action = e.parameter.action;
+    
+    // Router xử lý yêu cầu LẤY dữ liệu
+    if (action === "getProfiles") {
+      const data = apiGetProfiles();
+      return thanhCong_(data);
+    }
+    
+    return loi_("Hành động không hợp lệ hoặc thiếu tham số 'action'");
+  } catch (err) {
+    return loi_(err.message);
+  }
+}
 
+// BỔ SUNG THÊM HÀM doPost ĐỂ XỬ LÝ GỬI FILE VÀ CẬP NHẬT/XÓA HỒ SƠ
+function doPost(e) {
+  try {
+    // Đọc dữ liệu JSON gửi từ file HTML bên GitHub lên
+    const postData = JSON.parse(e.postData.contents);
+    const action = postData.action;
+
+    if (action === "uploadFile") {
+      const res = apiUploadStepFile(
+        postData.profileId,
+        Number(postData.stepIndex),
+        postData.base64Data,
+        postData.fileName,
+        postData.mimeType
+      );
+      return thanhCong_(res);
+    }
+
+    if (action === "saveProfile") {
+      const res = apiSaveProfile(postData.profile);
+      return thanhCong_(res);
+    }
+
+    if (action === "deleteProfile") {
+      const res = apiDeleteProfile(postData.id);
+      return thanhCong_(res);
+    }
+
+    return loi_("Hành động POST không hợp lệ");
+  } catch (err) {
+    return loi_(err.message);
+  }
+}
+
+// Hàm bổ trợ đóng gói dữ liệu JSON trả về
+function thanhCong_(data) {
+  return ContentService.createTextOutput(JSON.stringify({ success: true, data: data }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function loi_(msg) {
+  return ContentService.createTextOutput(JSON.stringify({ success: false, error: msg }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+  
+</script>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -742,6 +805,84 @@ tbody td { padding: 11px 14px; font-size: 0.87rem; }
 </div>
 
 <script>
+  //  THAY ĐƯỜNG DẪN WEB APP URL BẠN VỪA DEPLOY Ở PHẦN 1 VÀO ĐÂY
+        const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbzY-S7Oqgshkh9v8Tt7dKZVL5vok9AxrqKB_khuIoRrQgVFmVJXPWV-KzAxf242jf9OmA/exec";
+
+        // Hàm 1: Gọi hàm lấy toàn bộ Profile từ Sheet (doGet)
+        function taiDanhSachHoSo() {
+            capNhatTrangThai("Đang tải danh sách từ Google Sheets...");
+            
+            fetch(`${GOOGLE_API_URL}?action=getProfiles`)
+                .then(res => res.json())
+                .then(resData => {
+                    if(resData.success) {
+                        document.getElementById("outputProfiles").innerText = JSON.stringify(resData.data, null, 2);
+                        capNhatTrangThai("Tải dữ liệu thành công!");
+                    } else {
+                        alert("Lỗi: " + resData.error);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    capNhatTrangThai("Lỗi kết nối API.");
+                });
+        }
+
+        // Hàm 2: Xử lý đọc file và gửi POST data lên Google Drive (doPost)
+        function xuLyUploadFile() {
+            const pId = document.getElementById("profileId").value.trim();
+            const stepIdx = document.getElementById("stepIndex").value;
+            const fileCtrl = document.getElementById("fileInput").files[0];
+
+            if (!pId || !fileCtrl) {
+                alert("Vui lòng nhập đầy đủ ID Đảng viên và chọn file đính kèm!");
+                return;
+            }
+
+            capNhatTrangThai("Đang mã hóa file và upload...");
+
+            const reader = new FileReader();
+            // Đọc file thành cấu trúc base64 để truyền qua môi trường internet
+            reader.readAsDataURL(fileCtrl);
+            reader.onload = function () {
+                const rawBase64 = reader.result.split(',')[1]; 
+                
+                // Cấu trúc gói tin đẩy qua hàm doPost() của Apps Script
+                const payload = {
+                    action: "uploadFile",
+                    profileId: pId,
+                    stepIndex: parseInt(stepIdx),
+                    fileName: fileCtrl.name,
+                    mimeType: fileCtrl.type,
+                    base64Data: rawBase64
+                };
+
+                // Thực hiện gọi API
+                fetch(GOOGLE_API_URL, {
+                    method: "POST",
+                    body: JSON.stringify(payload)
+                })
+                .then(res => res.json())
+                .then(resData => {
+                    if(resData.success) {
+                        capNhatTrangThai("Tải lên thành công!");
+                        alert(`File được lưu tại: ${resData.data.fileUrl}`);
+                        taiDanhSachHoSo(); // Tải lại danh sách để kiểm tra cập nhật bước
+                    } else {
+                        alert("Lỗi từ server: " + resData.error);
+                        capNhatTrangThai("Tải lên thất bại.");
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    capNhatTrangThai("Lỗi mạng khi tải tệp.");
+                });
+            };
+        }
+
+        function capNhatTrangThai(msg) {
+            document.getElementById("status").innerText = msg;
+        }
   // ============================================================
 // Nội dung trong file MA.gs
 // ============================================================
